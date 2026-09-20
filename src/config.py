@@ -17,7 +17,7 @@ def app_directory() -> Path:
 class Config:
     username: str = field(default="", repr=False)
     password: str = field(default="", repr=False)
-    check_interval: float = 30.0
+    check_interval: float = 10.0
     adapter: str = "none"
     isp_suffix: str = "@cmcc"
 
@@ -25,7 +25,7 @@ class Config:
     def load(cls, directory: Path | None = None) -> "Config":
         load_dotenv((directory or app_directory()) / ".env", override=False)
         try:
-            interval = float(os.getenv("CHECK_INTERVAL", "30"))
+            interval = float(os.getenv("CHECK_INTERVAL", "10"))
             if not math.isfinite(interval) or not 5 <= interval <= 3600:
                 raise ValueError
         except ValueError:

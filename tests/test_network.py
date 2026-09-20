@@ -75,7 +75,7 @@ def test_online_requires_exact_expected_content() -> None:
     session.get.assert_called_once_with(
         _PROBES[0].url,
         allow_redirects=False,
-        timeout=(2.5, 2.5),
+        timeout=(1.5, 1.5),
         stream=True,
     )
     assert session.trust_env is False

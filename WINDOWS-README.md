@@ -4,13 +4,15 @@
 2. 双击 `configure.cmd`，填写学号和密码，将 `CAMPUS_ADAPTER` 改为 `ecjtu`。
 3. 设置 `CAMPUS_ISP_SUFFIX`：移动 `@cmcc`、电信 `@telecom`、联通 `@unicom`。账号建议只填学号。
 4. 保存配置，双击 `campus-auto-login.exe`。程序后台运行，不弹出窗口。
-5. 双击 `install-startup.cmd`，下次登录 Windows 自动启动，无需管理员权限。
+5. 双击 `install-startup.cmd`，创建当前用户的无延迟登录计划任务，并自动迁移本目录的旧启动快捷方式。如果系统策略拒绝创建任务，会保留旧快捷方式并显示错误。
 
 查看 `logs/campus.log`，出现 `INTERNET_OK` 表示已经联网。
 
 取消自启动用 `remove-startup.cmd`；退出当前程序需在任务管理器结束 `campus-auto-login.exe`。不要反复双击启动。
 
 修改配置后请重启程序。安装自启动后不要移动目录；需要移动时，先在旧目录取消自启动，再在新目录安装。
+
+加速版需保留 exe 旁的 `_internal` 文件夹，避免每次启动临时解压。启动后立即检测，无网络时每次检测结束后等待 1 秒重查，认证失败按 2、3、5、10 秒重试（请求耗时另计）；已联网时默认每 10 秒检查。已有配置可将 `CHECK_INTERVAL=30` 改为 `CHECK_INTERVAL=10`。
 
 无法登录时，检查账号、密码及运营商后缀；若开启了代理软件的 TUN 模式，先关闭后重试。
 

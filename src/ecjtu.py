@@ -102,6 +102,13 @@ class EcjtuPortalAdapter(PortalAdapter):
         self._local_ip_resolver = local_ip_resolver or _resolve_local_ip
         self._matched_context: tuple[str, str] | None = None
 
+    def recognizes_redirect(self, network: NetworkResult) -> bool:
+        """快速识别仅使用重定向及当前路由，不请求页面、不提交凭据。"""
+        if network.status != NetworkStatus.PORTAL_REQUIRED or not network.portal_url:
+            return False
+        context = _validated_portal_context(network.portal_url)
+        return context is not None and self._current_local_ip() == context[0]
+
     def matches(self, network: NetworkResult) -> bool:
         self._matched_context = None
         if network.status not in {NetworkStatus.LAN_ONLY, NetworkStatus.PORTAL_REQUIRED}:

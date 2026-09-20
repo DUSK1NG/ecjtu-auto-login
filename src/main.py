@@ -24,7 +24,8 @@ def main() -> int:
     else:
         adapter = UnconfiguredPortalAdapter()
         logger.info("程序启动；仅检测网络，不提交凭据")
-    controller = LoginController(config, NetworkChecker(), adapter, logger)
+    validator = adapter.recognizes_redirect if config.adapter == "ecjtu" and not args.check_only else None
+    controller = LoginController(config, NetworkChecker(portal_validator=validator), adapter, logger)
     try:
         if args.once:
             controller.step()

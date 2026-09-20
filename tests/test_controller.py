@@ -71,7 +71,7 @@ def test_auth_success_is_verified(caplog):
                                      AuthFailure.TIMEOUT, AuthFailure.REJECTED])
 def test_auth_failure(failure):
     c, checker, _, _ = make([NetworkStatus.PORTAL_REQUIRED], AuthResult(False, failure))
-    assert c.step() == 5
+    assert c.step() == 2
     assert c.state == State.AUTH_FAILED
     assert checker.check.call_count == 1
 
@@ -97,7 +97,7 @@ def test_backoff_cap_and_no_early_retry():
     c, checker, a, clock = make([], AuthResult(False, AuthFailure.INVALID_CREDENTIALS))
     checker.check.side_effect = None
     checker.check.return_value = net(NetworkStatus.PORTAL_REQUIRED)
-    for i, delay in enumerate([5, 10, 30, 60, 60]):
+    for i, delay in enumerate([2, 3, 5, 10, 10]):
         now = clock.return_value
         c.step()
         assert c.next_auth_at == now + delay
@@ -148,4 +148,4 @@ def test_stop_event_wait_is_interruptible():
     stop = Mock()
     stop.is_set.side_effect = [False, True]
     c.run(stop)
-    stop.wait.assert_called_once_with(30)
+    stop.wait.assert_called_once_with(10)

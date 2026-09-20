@@ -29,7 +29,8 @@ FAILURE_MESSAGES = {
 
 
 class LoginController:
-    RETRY_DELAYS = (5, 10, 30, 60)
+    RETRY_DELAYS = (2, 3, 5, 10)
+    OFFLINE_INTERVAL = 1.0
 
     def __init__(self, config: Config, checker: NetworkChecker, adapter: PortalAdapter,
                  logger: logging.Logger, clock=time.monotonic):
@@ -64,7 +65,10 @@ class LoginController:
             return self.config.check_interval
         if network.status == NetworkStatus.NO_NETWORK:
             self._transition(State.NO_NETWORK, "未检测到可用网络接口，等待连接")
-            return self.config.check_interval
+            return self.OFFLINE_INTERVAL
+        remaining = self.next_auth_at - self.clock()
+        if remaining > 0:
+            return min(remaining, self.config.check_interval)
         self.logger.info("Internet unavailable")
         try:
             matched = self.adapter.matches(network)
@@ -79,10 +83,7 @@ class LoginController:
                 self._transition(State.PORTAL_REQUIRED, "疑似 Portal；学校 Adapter 未确认环境，不提交凭据")
             else:
                 self._transition(State.LAN_ONLY, "已连接局域网，无 Internet；尚未确认学校认证环境")
-            return self.config.check_interval
-        remaining = self.next_auth_at - self.clock()
-        if remaining > 0:
-            return min(remaining, self.config.check_interval)
+            return self.OFFLINE_INTERVAL
         self._transition(State.PORTAL_REQUIRED, "Campus portal detected")
         if not self.config.username or not self.config.password:
             return self._failed("缺少 CAMPUS_USERNAME 或 CAMPUS_PASSWORD，请配置 .env 后重启")
@@ -101,7 +102,7 @@ class LoginController:
             self.logger.info("已收到校园网认证响应，结果待 Internet 验证")
         else:
             self._transition(State.AUTH_SUCCESS, "认证接口报告成功，正在验证 Internet")
-        verified = self.checker.check()
+        verified = self.checker.check(allow_fast_portal=False)
         if verified.status == NetworkStatus.INTERNET_OK:
             if result.verification_required:
                 self._transition(State.AUTH_SUCCESS, "Authentication successful；Internet 验证通过")

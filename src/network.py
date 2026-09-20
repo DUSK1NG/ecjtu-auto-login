@@ -54,7 +54,7 @@ _PROBES = (
     _Probe("https://connectivitycheck.gstatic.com/generate_204", 204, b""),
 )
 
-_REQUEST_TIMEOUT = (2.5, 2.5)
+_REQUEST_TIMEOUT = (1.5, 1.5)
 _PROBE_WALL_SECONDS = 6.0
 _MAX_BODY_BYTES = 4096
 _PORTAL_MARKERS = (
@@ -87,6 +87,7 @@ class NetworkChecker:
         self,
         session: requests.Session | None = None,
         interface_check: Callable[[], bool] | None = None,
+        portal_validator: Callable[[NetworkResult], bool] | None = None,
     ) -> None:
         if session is None:
             self._session = ProbeSession()
@@ -102,8 +103,9 @@ class NetworkChecker:
         # inherited from the shell. TLS certificate verification stays enabled.
         self._session.trust_env = False
         self._interface_check = interface_check or _default_interface_check
+        self._portal_validator = portal_validator
 
-    def check(self) -> NetworkResult:
+    def check(self, *, allow_fast_portal: bool = True) -> NetworkResult:
         try:
             has_interface = bool(self._interface_check())
         except Exception:
@@ -148,6 +150,15 @@ class NetworkChecker:
                         portal_url = _safe_redirect_url(
                             probe.url, response.headers.get("Location")
                         )
+                    # Only a school-validated redirect may skip the slow probes.
+                    # Authentication still revalidates the route and portal context.
+                    if allow_fast_portal and portal_url and self._portal_validator:
+                        candidate = NetworkResult(
+                            NetworkStatus.PORTAL_REQUIRED, "已识别学校门户重定向", portal_url
+                        )
+                        if self._portal_validator(candidate):
+                            _LOG.info("PROBE_DIAG campus_redirect | 已确认学校门户，立即进入认证")
+                            return candidate
                 elif response.status_code == 511:
                     portal_evidence = True
                 elif response.status_code == 200:
