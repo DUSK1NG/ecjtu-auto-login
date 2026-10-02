@@ -144,8 +144,40 @@ def test_online_clears_backoff():
 
 
 def test_stop_event_wait_is_interruptible():
-    c, _, _, _ = make([NetworkStatus.INTERNET_OK])
+    c, _, _, _ = make([NetworkStatus.NO_NETWORK])
     stop = Mock()
     stop.is_set.side_effect = [False, True]
     c.run(stop)
-    stop.wait.assert_called_once_with(10)
+    stop.wait.assert_called_once_with(1)
+
+
+def test_run_exits_when_already_online():
+    c, _, _, _ = make([NetworkStatus.INTERNET_OK])
+    c.run()
+    assert c.state == State.INTERNET_OK
+    assert c.failures == 0
+
+
+def test_run_retries_until_authentication_is_verified():
+    c, _, _, clock = make([
+        NetworkStatus.NO_NETWORK,
+        NetworkStatus.PORTAL_REQUIRED, NetworkStatus.LAN_ONLY,
+        NetworkStatus.PORTAL_REQUIRED, NetworkStatus.INTERNET_OK,
+    ], AuthResult(False, verification_required=True))
+
+    class VirtualStop:
+        def __init__(self):
+            self.waits = []
+
+        def is_set(self):
+            return False
+
+        def wait(self, seconds):
+            self.waits.append(seconds)
+            clock.return_value += seconds
+
+    stop = VirtualStop()
+    c.run(stop)
+    assert stop.waits == [1, 2]
+    assert c.state == State.INTERNET_OK
+    assert (c.failures, c.next_auth_at) == (0, 0)

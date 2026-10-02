@@ -42,7 +42,7 @@ $settings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -Execution
     -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable `
     -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
 $task = New-ScheduledTask -Action $taskAction -Trigger $trigger -Principal $principal -Settings $settings `
-    -Description 'Campus authentication at user sign-in, with no startup delay or network prerequisite.'
+    -Description 'Campus authentication at user sign-in; exits after Internet connectivity is verified.'
 Register-ScheduledTask -TaskName $taskName -InputObject $task -Force | Out-Null
 
 $check = Get-ScheduledTask -TaskName $taskName

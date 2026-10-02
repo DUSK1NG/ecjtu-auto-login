@@ -3,11 +3,11 @@ Windows 校园网自动认证工具，用于连接华东交通大学有线网或
 
 ## 快速开始
 
-从[发布页](https://github.com/DUSK1NG/ecjtu-auto-login/releases/latest)下载 `campus-auto-login-windows.zip`，完整解压到固定目录。双击 `configure.cmd` 填写账号配置，保存后运行 `campus-auto-login.exe`；程序在后台运行，不显示窗口。
+从[发布页](https://github.com/DUSK1NG/ecjtu-auto-login/releases/latest)下载 `campus-auto-login-windows.zip`，完整解压到固定目录。双击 `configure.cmd` 填写账号配置，保存后运行 `campus-auto-login.exe`；程序不显示窗口，未联网时按间隔尝试连接，确认联网成功后自动退出。
 
 ## 使用
 
-查看 `logs/campus.log`，`INTERNET_OK` 表示联网检查通过。请勿重复启动；修改配置后，在任务管理器结束程序再重新打开。
+查看 `logs/campus.log`，`INTERNET_OK` 表示联网检查通过，程序随后退出。启动时已经在线也会直接退出；退出后再次掉线，可手动运行程序重新连接。请勿重复启动；修改配置后，在任务管理器结束程序再重新打开。
 
 需要登录 Windows 后自动启动时，双击 `install-startup.cmd`；取消自启动使用 `remove-startup.cmd`，不会结束当前进程。移动目录前先取消自启动，移动后重新安装。完整步骤与排障见 [Windows 使用说明](WINDOWS-README.md)。
 
@@ -23,7 +23,7 @@ CAMPUS_ISP_SUFFIX=@cmcc
 CHECK_INTERVAL=10
 ```
 
-移动后缀为 `@cmcc`，电信为 `@telecom`，联通为 `@unicom`；账号建议只填学号。账号密码保存在本机，反馈时不要上传 `.env` 或包含个人信息的日志。
+移动后缀为 `@cmcc`，电信为 `@telecom`，联通为 `@unicom`；账号建议只填学号。账号密码保存在本机，反馈时不要上传 `.env` 或包含个人信息的日志。`CHECK_INTERVAL` 控制认证重试等待期间的最大检测间隔，单位为秒。
 
 ## 开发
 

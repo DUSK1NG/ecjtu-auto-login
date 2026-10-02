@@ -116,4 +116,8 @@ class LoginController:
     def run(self, stop: Event | None = None):
         stop = stop or Event()
         while not stop.is_set():
-            stop.wait(self.step())
+            delay = self.step()
+            if self.state == State.INTERNET_OK:
+                self.logger.info("联网已确认，程序退出")
+                return
+            stop.wait(delay)

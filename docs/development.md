@@ -9,7 +9,7 @@ python -m venv .venv
 .venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-将 `.env.example` 复制为 `.env`，按[首页配置](../README.md#配置)填写。模块入口是 `src.main`；常驻运行使用 `python -m src.main`，从上述虚拟环境的解释器启动，按 `Ctrl+C` 退出。
+将 `.env.example` 复制为 `.env`，按[首页配置](../README.md#配置)填写。模块入口是 `src.main`；运行使用 `python -m src.main`，从上述虚拟环境的解释器启动。程序确认联网成功后自动退出；等待连接期间可按 `Ctrl+C` 退出。
 
 查看实际支持的选项：
 
@@ -37,7 +37,7 @@ usage: main.py [-h] [--once] [--check-only]
 124 passed in 1.42s
 ```
 
-测试使用伪造响应和临时配置，不需要真实账号。网络与认证参数定义在配置和适配器源码中；`CHECK_INTERVAL` 控制已联网时的检查间隔，不等同于认证重试间隔。
+测试使用伪造响应和临时配置，不需要真实账号。网络与认证参数定义在配置和适配器源码中；`CHECK_INTERVAL` 控制认证重试等待期间的最大检测间隔，单位为秒。
 
 ## Windows 打包
 
