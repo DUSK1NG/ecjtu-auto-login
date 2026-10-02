@@ -1,29 +1,25 @@
-# 华东交通大学校园网自动连接程序 · Windows 使用教程
+# Windows 使用说明
+本说明介绍校园网自动连接程序的账号配置、后台运行和登录 Windows 后自启动操作。
 
-1. 将整个 ZIP 解压到固定目录，不要直接在压缩包内运行。
-2. 双击 `configure.cmd`，填写学号和密码，将 `CAMPUS_ADAPTER` 改为 `ecjtu`。
-3. 设置 `CAMPUS_ISP_SUFFIX`：移动 `@cmcc`、电信 `@telecom`、联通 `@unicom`。账号建议只填学号。
-4. 保存配置，双击 `campus-auto-login.exe`。程序后台运行，不弹出窗口。
-5. 双击 `install-startup.cmd`，创建当前用户的无延迟登录计划任务，并自动迁移本目录的旧启动快捷方式。如果系统策略拒绝创建任务，会保留旧快捷方式并显示错误。
+## 快速开始
 
-查看 `logs/campus.log`，出现 `INTERNET_OK` 表示已经联网。
+1. 将整个 ZIP 解压到固定目录，保留 EXE 旁的 `_internal` 文件夹。
+2. 双击 `configure.cmd`，填写学号和密码，将 `CAMPUS_ADAPTER` 设为 `ecjtu`。
+3. 将 `CAMPUS_ISP_SUFFIX` 设为移动 `@cmcc`、电信 `@telecom` 或联通 `@unicom`；学号不带后缀。
+4. 保存配置后双击 `campus-auto-login.exe`，程序在后台运行。
 
-取消自启动用 `remove-startup.cmd`；退出当前程序需在任务管理器结束 `campus-auto-login.exe`。不要反复双击启动。
+## 使用
 
-修改配置后请重启程序。安装自启动后不要移动目录；需要移动时，先在旧目录取消自启动，再在新目录安装。
+在 `logs/campus.log` 中查看联网检查状态，`INTERNET_OK` 表示联网检查通过。修改配置后需在任务管理器结束程序再打开；不要重复启动。
 
-加速版需保留 exe 旁的 `_internal` 文件夹，避免每次启动临时解压。启动后立即检测，无网络时每次检测结束后等待 1 秒重查，认证失败按 2、3、5、10 秒重试（请求耗时另计）；已联网时默认每 10 秒检查。已有配置可将 `CHECK_INTERVAL=30` 改为 `CHECK_INTERVAL=10`。
+双击 `install-startup.cmd` 创建当前用户的登录计划任务，安装成功后保留程序目录。此入口会迁移本目录的旧启动快捷方式；系统策略拒绝任务创建时，保留旧快捷方式并显示错误。取消自启动使用 `remove-startup.cmd`，不会结束正在运行的进程。
 
-无法登录时，检查账号、密码及运营商后缀；若开启了代理软件的 TUN 模式，先关闭后重试。
+要移动程序目录，先在旧目录取消自启动，移动后再安装。完整运行包无需安装 Python。
 
-## 免责声明
+## 配置与排障
 
-本程序为个人开发的非官方工具，与华东交通大学及各运营商无隶属或授权关系。仅用于本人有权使用的校园网账号登录，不提供绕过认证、缴费或网络访问限制的功能，请遵守学校及运营商的网络使用规定。
+账号设置见[首页配置](README.md#配置)。已有 `.env` 不会被配置入口覆盖。无法登录时检查账号、密码、运营商后缀与 `CAMPUS_ADAPTER`；使用代理软件的 TUN 模式时可先关闭再检查。
 
-程序按现状提供，不保证在所有设备或校园网系统更新后持续可用。请妥善保管本机 `.env` 中的账号密码，反馈时不要上传密码或包含个人信息的日志。
+程序为非官方工具，仅用于本人有权使用的校园网账号，不绕过认证、缴费或访问限制。请遵守学校及运营商规定，妥善保管本机 `.env`，不要上传密码或个人日志；校园网系统变化可能影响可用性。
 
-## 联系方式
-
-邮箱：[jk1ng@qq.com](mailto:jk1ng@qq.com)
-
-项目：[ecjtu-auto-login](https://github.com/DUSK1NG/ecjtu-auto-login)
+问题反馈：[GitHub Issues](https://github.com/DUSK1NG/ecjtu-auto-login/issues)。邮箱：[jk1ng@qq.com](mailto:jk1ng@qq.com)。
